@@ -1,15 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
   <!-- Black background -->
   <rect width="100%" height="100%" fill="#000"/>
-  <!-- Walkable Area (Example: Combine previous shapes into one white path) -->
-  <!-- NOTE: This combined path is simplified. Realistically, you'd draw the exact walkable shape -->
-  <path id="walkable" fill="#fff" stroke="none" d="
-    M 60,60 L 260,40 L 240,180 L 60,160 Z /* Room 1 area */
-    M 300,50 L 540,70 L 520,190 L 300,170 Z /* Room 2 area */
-    M 70,220 L 250,240 L 230,360 L 70,340 Z /* Room 3 area */
-    M 280,230 L 520,250 L 500,370 L 280,350 Z /* Room 4 area */
-    M 50,200 Q 300,100 550,200 L 550, 205 Q 300,105 50,205 Z /* Top part of corridor approx */
-    M 50,200 Q 300,300 550,200 L 550, 195 Q 300,295 50,195 Z /* Bottom part of corridor approx */
-    "/>
-  <!-- You might have multiple <path> elements for different white areas -->
+  <!-- Room 1 (top left) -->
+  <polygon fill="#fff" stroke="none" points="80,60 260,40 240,180 60,160"/>
+  <!-- Room 2 (top right) -->
+  <polygon fill="#fff" stroke="none" points="340,60 540,80 520,190 320,170"/>
+  <!-- Room 3 (bottom left) -->
+  <polygon fill="#fff" stroke="none" points="90,250 250,240 230,360 70,340"/>
+  <!-- Room 4 (bottom right) -->
+  <polygon fill="#fff" stroke="none" points="320,250 520,260 500,370 300,350"/>
+  <!-- Central corridor (horizontal) -->
+  <rect x="120" y="180" width="360" height="40" fill="#fff"/>
+  <!-- West corridor (vertical, connects Room 1 and Room 3 to central) -->
+  <rect x="90" y="120" width="40" height="160" fill="#fff"/>
+  <!-- East corridor (vertical, connects Room 2 and Room 4 to central) -->
+  <rect x="470" y="120" width="40" height="160" fill="#fff"/>
+  <!-- Diagonal connectors for more complexity -->
+  <polygon fill="#fff" stroke="none" points="120,180 160,180 120,220 80,220"/>
+  <polygon fill="#fff" stroke="none" points="480,180 520,180 520,220 480,220"/>
 </svg>
