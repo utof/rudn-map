@@ -33,7 +33,7 @@
 
 	// --- Constants ---
 	const SVG_URL = 'src/routes/map.svg';
-	const POI_URL = 'src/router/pois.json';
+	const POI_URL = 'src/routes/pois.json';
 	const GRID_RESOLUTION = 10;
 
 	// --- State ---
@@ -82,24 +82,72 @@
 			// 3. Parse SVG and get bounds
 			const parser = new DOMParser();
 			const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+			console.log('Parsed SVG document:', svgDoc);
+
 			svgRootElement = svgDoc.querySelector('svg');
 			if (!svgRootElement) throw new Error('Could not find SVG element in fetched content.');
+			console.log('Found SVG root element:', svgRootElement);
 
-			const viewBox = svgRootElement.viewBox.baseVal;
-			if (!viewBox) throw new Error('SVG missing viewBox attribute.');
-			const svgWidth = viewBox.width;
-			const svgHeight = viewBox.height;
+			// Get SVG dimensions with extensive error handling
+			let svgWidth, svgHeight;
+			try {
+				console.log('Attempting to access viewBox...');
+				if (svgRootElement.viewBox && svgRootElement.viewBox.baseVal) {
+					console.log('Using viewBox dimensions');
+					svgWidth = svgRootElement.viewBox.baseVal.width;
+					svgHeight = svgRootElement.viewBox.baseVal.height;
+				} else {
+					console.log('Falling back to width/height attributes');
+					svgWidth = parseFloat(svgRootElement.getAttribute('width') || '0');
+					svgHeight = parseFloat(svgRootElement.getAttribute('height') || '0');
+					if (!svgWidth || !svgHeight) {
+						throw new Error('SVG missing both viewBox and width/height attributes.');
+					}
+				}
+				console.log('SVG dimensions:', { width: svgWidth, height: svgHeight });
+			} catch (err: unknown) {
+				console.error('Error getting SVG dimensions:', err);
+				const message = err instanceof Error ? err.message : 'Unknown error getting SVG dimensions';
+				throw new Error(`Failed to get SVG dimensions: ${message}`);
+			}
 			// Use the imported LatLngBounds type if needed, but L.latLngBounds works fine
 			const bounds = L.latLngBounds([
 				[0, 0],
 				[svgHeight, svgWidth]
 			]);
 
-			// 4. Add SVG Overlay
-			svgOverlay = L.svgOverlay(svgContent, bounds, {
-				interactive: false
-			}).addTo(map);
-			map.fitBounds(bounds);
+			// 4. Add SVG directly to map container
+			try {
+				// Create div to hold SVG
+				const svgContainer = document.createElement('div');
+				svgContainer.className = 'svg-map-container';
+				svgContainer.style.position = 'absolute';
+				svgContainer.style.width = '100%';
+				svgContainer.style.height = '100%';
+				svgContainer.style.pointerEvents = 'none';
+
+				// Add sanitized SVG content
+				svgContainer.innerHTML = `<?xml version="1.0" encoding="UTF-8"?>
+					<svg xmlns="http://www.w3.org/2000/svg" 
+						xmlns:xlink="http://www.w3.org/1999/xlink"
+						viewBox="0 0 ${svgWidth} ${svgHeight}" 
+						width="100%" 
+						height="100%"
+						preserveAspectRatio="none">
+						${svgContent.match(/<svg[^>]*>([\s\S]*)<\/svg>/i)?.[1] || ''}
+					</svg>`;
+
+				// Add to map pane
+				const mapPane = map.getPane('mapPane') || map.getPanes().mapPane;
+				mapPane.appendChild(svgContainer);
+
+				// Fit bounds after adding SVG
+				map.fitBounds(bounds);
+			} catch (err: unknown) {
+				console.error('Failed to add SVG to map:', err);
+				const message = err instanceof Error ? err.message : 'Unknown error adding SVG to map';
+				throw new Error(`Failed to add SVG to map: ${message}`);
+			}
 
 			// 5. Build Navigation Grid
 			buildNavigationGrid(svgWidth, svgHeight);
