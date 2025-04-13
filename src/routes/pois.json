@@ -1,0 +1,10 @@
+{
+	"pois": [
+		{ "id": "room1", "name": "Room 1", "x": 150, "y": 110 },
+		{ "id": "room2", "name": "Room 2", "x": 420, "y": 110 },
+		{ "id": "room3", "name": "Room 3", "x": 150, "y": 290 },
+		{ "id": "room4", "name": "Room 4", "x": 400, "y": 300 },
+		{ "id": "corridor_west", "name": "West Corridor", "x": 80, "y": 200 },
+		{ "id": "corridor_east", "name": "East Corridor", "x": 520, "y": 200 }
+	]
+}
