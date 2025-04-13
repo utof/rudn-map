@@ -29,3 +29,4 @@ vite.config.ts.timestamp-_
 # my stuff
 
 /.git
+./.git
